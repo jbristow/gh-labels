@@ -19,11 +19,14 @@ function labelRequest(httpMethod, href, token, label) {
 }
 function handleError(error) {
     if (error.statusCode == 404) {
-        return `got 404 for ${error.options.uri}`;
+        return Promise.reject(`got 404 for ${error.options.uri}`);
     } else if (error.statusCode == 401) {
-        return `provided token lacks permissions for ${error.options.uri}`;
+        return Promise.reject(`provided token lacks permissions for ${error.options.uri}`);
+    } else if (error.statusCode == 422) {
+        e = _.join(', ')(error.error.errors.map(error => `field "${error.field}" ${error.code}`));
+        return Promise.reject(`invalid label: ${error.error.message}: ${e}.`);
     }
-    return `unknown error: ${error}`;
+    return Promise.reject(`unknown error: ${error}`);
 }
 
 function init(token, endpoint) {
@@ -62,7 +65,7 @@ function init(token, endpoint) {
             ]).then(_.flatten);
         },
         listLabels: function(repoUrl) {
-            console.log(repoUrl);
+            console.error(repoUrl);
             return request({
                 uri: `${repoUrl}/labels`,
                 headers: defaultHeaders(token),

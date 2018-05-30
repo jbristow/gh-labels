@@ -59,7 +59,9 @@ function promiseAll(labels, promisorFunc, logName, opts, repoUrl) {
         if (opts["dry-run"]) {
             return Promise.resolve(`[DRY RUN] ${logName} ${label.name}: ${label.color}`);
         }
-        return promisorFunc(label, repoUrl).then(() => `${logName} ${label.name}: ${label.color}`).catch();
+        return promisorFunc(label, repoUrl).then((line) => {
+            return `${logName} ${label.name}: ${label.color}`;
+        }).catch(e => e);
     })(labels));
 }
 
@@ -96,20 +98,20 @@ function deleteLabels(client, opts, existing, labels) {
     return Promise.resolve([]);
 }
 
-function processRepo(client, opts, repo, labels) {
-    return existingLabels => {
+function processRepo(client, opts, repo, labels, existingLabels) {
         return Promise.all([
+            repo.full_name,
             createLabels(client, opts, existingLabels, labels, repo.url),
             updateLabels(client, opts, existingLabels, labels),
             deleteLabels(client, opts, existingLabels, labels)
         ]).then(repoResult => {
             let output = _.flatten(repoResult);
-            if (output.length === 0) {
-                output = [ "NO CHANGES" ];
+            if (output.length === 1) {
+
+                output = output.concat([ "NO CHANGES" ]);
             }
-            return [ `${repo.full_name}:` ].concat(output);
+            return output;
         });
-    };
 }
 
 function main(args) {
@@ -122,9 +124,9 @@ function main(args) {
     const labels = labelFile.read(opts["file"]);
     const client = ghClient.init(opts["token"], opts["endpoint"]);
     new Promise((resolve) => {
-        if (_.has([ "owner", "repo" ])(opts)) {
+        if (opts["owner"] !== undefined && opts["repo"] !== undefined) {
             resolve([ client.getRepo(opts["owner"], opts["repo"]) ]);
-        } else if (_.has([ "owner" ])(opts)) {
+        } else if (_.has("owner")(opts)) {
             resolve(client.listRepos(opts["owner"]));
         }
         resolve(Promise.all(opts["owners"].map(owner => {
@@ -132,8 +134,7 @@ function main(args) {
         })).then(_.flatten));
     }).then(repoList => {
         return Promise.all(repoList.map(repo => {
-            return client.listLabels(repo.url)
-                .then(processRepo(client, opts, repo, labels));
+            return Promise.resolve(repo).then(r => client.listLabels(r.url).then(existingLabels => processRepo(client, opts, r, labels, existingLabels)));
         })).then(_.flatten);
     }).then(results => {
         console.log(results.join("\n"));
