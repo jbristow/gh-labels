@@ -1,7 +1,6 @@
 # github labels
 
-This repo is used to manage the Github issue labels across all of the CI/CD
-repos.
+This repo is used to easily sync and manage github labels based on a yml file.
 
 ## Prerequisites
 
@@ -37,5 +36,9 @@ The repos that will be processed exist in organization as defined by `org` in th
 * Run the update script in dry-run mode
     ```bash
     gh-labels -o <repo-owner> -t <gh-token> -r <repo-name> --dry-run
+    ```
+* Run on an enterprise github
+    ```bash
+    gh-labels -o <repo-owner> -t <gh-token> -r <repo-name> -e "https://<company github url>"
     ```
 
