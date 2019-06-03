@@ -1,4 +1,6 @@
 # github labels
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjbristow%2Fgh-labels.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjbristow%2Fgh-labels?ref=badge_shield)
+
 
 This repo is used to easily sync and manage github labels based on a yml file.
 
@@ -42,3 +44,7 @@ The repos that will be processed exist in organization as defined by `org` in th
     gh-labels -o <repo-owner> -t <gh-token> -r <repo-name> -e "https://<company github url>"
     ```
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjbristow%2Fgh-labels.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjbristow%2Fgh-labels?ref=badge_large)
