@@ -1,21 +1,23 @@
 {
   "name": "gh_label",
   "version": "1.0.0",
-  "description": "This repo is used to manage the Github issue labels across all of the CI/CD repos.",
+  "description": "This repo is used to manage Github issue labels.",
   "main": "src/main.js",
   "dependencies": {
     "js-yaml": "^3.13.1",
+    "link": "^0.1.5",
     "lodash": "^4.17.11",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "yargs": "^13.2.2"
   },
   "scripts": {
-    "test": "node_modules/.bin/nyc node_modules/.bin/mocha"
+    "test": "node_modules/.bin/nyc node_modules/.bin/mocha",
+    "check": "node_modules/.bin/eslint -c ./.eslintrc.yml --ext js src/ test/"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.td.teradata.com/intellicloud-devops/gh_labels"
+    "url": "https://github.com/jbristow/gh_labels"
   },
   "author": "Jon Bristow <jonthegm@yahoo.com>",
   "bin": {
@@ -24,7 +26,11 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.0.1",
+    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-plugin-chai-expect": "^2.0.1",
+    "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-lodash-fp": "^2.2.0-a1",
+    "eslint-plugin-mocha": "^5.3.0",
     "mocha": "^6.1.4",
     "nyc": "^14.1.1"
   },

@@ -1,13 +1,19 @@
-const client = require("../src/client");
-const assert = require("chai").assert;
+/* eslint-env mocha */
+const { expect } = require("chai");
+const Client = require("../src/client");
+
+const testClient = new Client("test-token", "test-url");
 
 describe("client", () => {
     describe("#defaultHeaders()", () => {
         it("adds the Accept and Authorization headers", () => {
-            assert.hasAllKeys(client.defaultHeaders("test-token"), [ "Authorization", "Accept" ]);
+            expect(testClient.defaultHeaders())
+                .to.include.all.keys(["Authorization", "Accept", "User-Agent"]);
         });
         it("adds the token to the Authorization header", () => {
-            assert.equal(client.defaultHeaders("test-token").Authorization, "token test-token");
+            expect(testClient.defaultHeaders())
+                .to.have.property("Authorization")
+                .that.is.equal("token test-token");
         });
     });
 });
