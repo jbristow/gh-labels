@@ -60,7 +60,7 @@ function promiseAll(labels, promisorFunc, logName, opts, repoUrl) {
         }
         return promisorFunc(label, repoUrl)
             .then(() => `${logName} ${label.name}: ${label.color}`)
-            .catch(e => e);
+            .catch((e) => e);
     })(labels));
 }
 
@@ -73,7 +73,7 @@ function createLabels(client, opts, existing, labels, repoUrl) {
 }
 
 function hasIncomingLabelChange({ name, color }) {
-    return newLabel => name === newLabel.name
+    return (newLabel) => name === newLabel.name
       && String(newLabel.color) !== String(color);
 }
 
@@ -81,9 +81,9 @@ function getChangedLabels(labels) {
     return (el) => {
         const { color } = _.find(hasIncomingLabelChange)(labels);
         if (color) {
-            return Object.assign({}, el, {
-                color: String(color),
-            });
+            const retVal = { ...el };
+            retVal.color = String(color);
+            return retVal;
         }
         return null;
     };
@@ -132,13 +132,13 @@ function main(args) {
     const labels = labelFile.read(file);
     const client = new Client(token, endpoint === undefined ? "https://api.github.com" : `${endpoint}/v3/api/`);
 
-    const processWithExisting = repo => existingLabels => processRepo(
+    const processWithExisting = (repo) => (existingLabels) => processRepo(
         client, opts, repo, labels, existingLabels,
     );
 
-    const listLabels = thenFn => repo => client.listLabels(repo.url).then(thenFn(repo));
-    const resolveRepo = thenFn => repo => Promise.resolve(repo).then(thenFn);
-    const getAndFlatten = (procStep1, procStep2, procStep3) => repoList => Promise.all(
+    const listLabels = (thenFn) => (repo) => client.listLabels(repo.url).then(thenFn(repo));
+    const resolveRepo = (thenFn) => (repo) => Promise.resolve(repo).then(thenFn);
+    const getAndFlatten = (procStep1, procStep2, procStep3) => (repoList) => Promise.all(
         repoList.map(procStep1(procStep2(procStep3))),
     ).then(_.flatten);
 
@@ -148,7 +148,7 @@ function main(args) {
         } else if (_.has("owner")(opts)) {
             resolve(client.listRepos(opts.owner));
         }
-        resolve(Promise.all(opts.owners.map(owner => client.listRepos(owner))).then(_.flatten));
+        resolve(Promise.all(opts.owners.map((owner) => client.listRepos(owner))).then(_.flatten));
     }).then(getAndFlatten(resolveRepo, listLabels, processWithExisting))
         .then((results) => {
             console.log(results.join("\n"));

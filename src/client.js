@@ -10,7 +10,7 @@ function handleError(errorObj) {
         return Promise.reject(new Error(`provided token lacks permissions for ${options.uri}`));
     }
     if (error.statusCode === 422) {
-        const errorMsg = _.join(", ")(error.error.errors.map(e => `field "${e.field}" ${e.code}`));
+        const errorMsg = _.join(", ")(error.error.errors.map((e) => `field "${e.field}" ${e.code}`));
         return Promise.reject(new Error(`invalid label: ${error.message}: ${errorMsg}.`));
     }
     return Promise.reject(new Error(`unknown error: ${errorObj}`));
