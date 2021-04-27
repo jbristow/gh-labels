@@ -38,7 +38,7 @@ function read(filename) {
 
     let labels;
     try {
-        labels = yaml.safeLoad(fs.readFileSync(filename, "utf8"));
+        labels = yaml.load(fs.readFileSync(filename, "utf8"));
     } catch (e) {
         throw new Error(`invalid yaml file '${filename}': ${e}`);
     }
