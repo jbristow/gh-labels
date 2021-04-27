@@ -1,6 +1,6 @@
 {
   "name": "gh_label",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "This repo is used to manage Github issue labels.",
   "main": "src/main.js",
   "dependencies": {
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jbristow/gh_labels"
+    "url": "https://github.com/jbristow/gh-labels"
   },
   "author": "Jon Bristow <jonthegm@yahoo.com>",
   "bin": {
