@@ -4,7 +4,7 @@ env:
 plugins:
   - lodash-fp
   - chai-expect
-  - mocha
+    #  - mocha
 extends:
   - airbnb-base
   - 'plugin:lodash-fp/recommended'
@@ -32,17 +32,17 @@ rules:
   chai-expect/no-inner-compare: 1
   chai-expect/missing-assertion: 2
   chai-expect/terminating-properties: 1
-  mocha/no-exclusive-tests: error
-  mocha/no-global-tests: error
-  mocha/no-hooks: error
-  mocha/no-hooks-for-single-case: error
-  mocha/no-identical-title: error
-  mocha/no-nested-tests: error
-  mocha/no-pending-tests: error
-  mocha/no-return-and-callback: error
-  mocha/no-setup-in-describe: error
-  mocha/no-sibling-hooks: error
-  mocha/no-skipped-tests: error
-  mocha/no-top-level-hooks: error
-  mocha/prefer-arrow-callback: error
-  mocha/no-async-describe: error
+#  mocha/no-exclusive-tests: error
+#  mocha/no-global-tests: error
+#  mocha/no-hooks: error
+#  mocha/no-hooks-for-single-case: error
+#  mocha/no-identical-title: error
+#  mocha/no-nested-tests: error
+#  mocha/no-pending-tests: error
+#  mocha/no-return-and-callback: error
+#  mocha/no-setup-in-describe: error
+#  mocha/no-sibling-hooks: error
+#  mocha/no-skipped-tests: error
+#  mocha/no-top-level-hooks: error
+#  mocha/prefer-arrow-callback: error
+#  mocha/no-async-describe: error

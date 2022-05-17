@@ -1,7 +1,8 @@
 const yargs = require("yargs");
 const _ = require("lodash/fp");
-const Client = require("./client.js");
-const labelFile = require("./label_file.js");
+
+const Client = require("./client");
+const labelFile = require("./label_file");
 
 const yargOpts = {
     file: {
@@ -53,33 +54,39 @@ const yargOpts = {
     },
 };
 
-function promiseAll(labels, promisorFunc, logName, opts, repoUrl) {
-    return Promise.all(_.map((label) => {
+async function promiseAll(labels, promisorFunc, logName, opts, repoUrl) {
+    return Promise.all(_.map(async (label) => {
         if (opts["dry-run"]) {
-            return Promise.resolve(`[DRY RUN] ${logName} ${label.name}: ${label.color}`);
+            return `[DRY RUN] ${logName} ${label.name}: ${label.color}`;
         }
-        return promisorFunc(label, repoUrl)
-            .then(() => `${logName} ${label.name}: ${label.color}`)
-            .catch((e) => e);
+        await promisorFunc(label, repoUrl);
+        return `${logName} ${label.name}: ${label.color}`;
     })(labels));
 }
 
-function createLabels(client, opts, existing, labels, repoUrl) {
+async function createLabels(client, opts, existing, labels, repoUrl) {
     if (!opts["no-create"]) {
         const newLabels = _.differenceBy("name")(labels, existing);
-        return promiseAll(newLabels, client.createLabel, "CREATE", opts, repoUrl);
+        return promiseAll(newLabels, (label) => client.createLabel(label), "CREATE", opts, repoUrl);
     }
-    return Promise.resolve([]);
+    return [];
 }
 
-function hasIncomingLabelChange({ name, color }) {
+function hasIncomingLabelChange({
+    name,
+    color,
+}) {
     return (newLabel) => name === newLabel.name
-      && String(newLabel.color) !== String(color);
+        && String(newLabel.color) !== String(color);
 }
 
 function getChangedLabels(labels) {
     return (el) => {
-        const { color } = _.find(hasIncomingLabelChange)(labels);
+        const label = _.find(hasIncomingLabelChange(el))(labels);
+        if (!label) {
+            return null;
+        }
+        const { color } = label;
         if (color) {
             const retVal = { ...el };
             retVal.color = String(color);
@@ -89,73 +96,91 @@ function getChangedLabels(labels) {
     };
 }
 
-function updateLabels(client, opts, existing, labels) {
+async function updateLabels(client, opts, existing, labels) {
     if (!opts["no-create"]) {
         const changedLabels = _.compact(_.map(getChangedLabels(labels))(existing));
-        return promiseAll(changedLabels, client.updateLabel, "UPDATE", opts);
+        return promiseAll(
+            changedLabels,
+            (label) => client.updateLabel(label),
+            "UPDATE",
+            opts,
+        );
     }
-    return Promise.resolve([]);
+    return [];
 }
 
-function deleteLabels(client, opts, existing, labels) {
+async function deleteLabels(client, opts, existing, labels) {
     if (!opts["no-delete"]) {
         const labelsToDelete = _.differenceBy("name")(existing, labels);
-        return promiseAll(labelsToDelete, client.deleteLabel, "DELETE", opts);
+        return promiseAll(
+            labelsToDelete,
+            (label) => client.deleteLabel(label),
+            "DELETE",
+            opts,
+        );
     }
-    return Promise.resolve([]);
+    return [];
 }
 
-function processRepo(client, opts, repo, labels, existingLabels) {
-    return Promise.all([
+async function processRepo(client, opts, repo, labels, existingLabels) {
+    const repoResult = await Promise.all([
         repo.full_name,
         createLabels(client, opts, existingLabels, labels, repo.url),
         updateLabels(client, opts, existingLabels, labels),
         deleteLabels(client, opts, existingLabels, labels),
-    ]).then((repoResult) => {
-        let output = _.flatten(repoResult);
-        if (output.length === 1) {
-            output = output.concat(["NO CHANGES"]);
-        }
-        return output;
-    });
+    ]);
+
+    let output = _.flatten(repoResult);
+    if (output.length === 1) {
+        output = output.concat(["NO CHANGES"]);
+    }
+    return output;
 }
 
-
-function main(args) {
-    const opts = yargs.options(yargOpts).demandOption(["file", "token"]).parse(args);
+async function mainAsync(args) {
+    const opts = yargs.options(yargOpts)
+        .demandOption(["file", "token"])
+        .parse(args);
     if (!_.has("owner")(opts) && !_.has("owners")(opts)) {
         yargs.showHelp();
         console.error("Must provide one of: owner, owners");
         process.exit();
     }
-    const { file, token, endpoint } = opts;
+    const {
+        file,
+        token,
+        endpoint,
+    } = opts;
     const labels = labelFile.read(file);
-    const client = new Client(token, endpoint === undefined ? "https://api.github.com" : `${endpoint}/v3/api/`);
+    const baseURL = (endpoint === undefined || endpoint === "")
+        ? "https://api.github.com"
+        : `${endpoint}/v3/api/`;
+    const client = new Client(token, baseURL);
 
-    const processWithExisting = (repo) => (existingLabels) => processRepo(
-        client, opts, repo, labels, existingLabels,
-    );
-
-    const listLabels = (thenFn) => (repo) => client.listLabels(repo.url).then(thenFn(repo));
-    const resolveRepo = (thenFn) => (repo) => Promise.resolve(repo).then(thenFn);
-    const getAndFlatten = (procStep1, procStep2, procStep3) => (repoList) => Promise.all(
-        repoList.map(procStep1(procStep2(procStep3))),
-    ).then(_.flatten);
-
-    new Promise((resolve) => {
+    try {
+        let repos;
         if (opts.owner !== undefined && opts.repo !== undefined) {
-            resolve([client.getRepo(opts.owner, opts.repo)]);
+            repos = [await client.getRepo(opts.owner, opts.repo)];
         } else if (_.has("owner")(opts)) {
-            resolve(client.listRepos(opts.owner));
+            repos = await client.listRepos(opts.owner);
+        } else {
+            const allRepos = Promise.all(opts.owners.map((owner) => client.listRepos(owner)));
+            repos = _.flatten(await allRepos);
         }
-        resolve(Promise.all(opts.owners.map((owner) => client.listRepos(owner))).then(_.flatten));
-    }).then(getAndFlatten(resolveRepo, listLabels, processWithExisting))
-        .then((results) => {
-            console.log(results.join("\n"));
-        }).catch((error) => {
-            console.error(`gh-label failed: ${error}`);
-            console.error(JSON.stringify(error));
-        });
+        const results = await Promise.all(repos.map(async (repo) => {
+            const existingLabels = await client.listLabels(repo.url);
+            return processRepo(client, opts, repo, labels, existingLabels);
+        }));
+        console.log(_.flatten(results)
+            .join("\n"));
+    } catch (error) {
+        console.error(`gh-label failed: ${error}`);
+        console.error(error);
+    }
+}
+
+function main() {
+    mainAsync().then();
 }
 
 module.exports.main = main;
