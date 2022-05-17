@@ -1,6 +1,6 @@
 {
   "name": "gh_label",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "This repo is used to manage Github issue labels.",
   "main": "src/main.js",
   "dependencies": {
