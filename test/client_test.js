@@ -7,11 +7,11 @@ const testClient = new Client("test-token", "test-url");
 describe("client", () => {
     describe("#defaultHeaders()", () => {
         it("adds the Accept and Authorization headers", () => {
-            expect(testClient.defaultHeaders())
+            expect(testClient.instance.defaults.headers)
                 .to.include.all.keys(["Authorization", "Accept", "User-Agent"]);
         });
         it("adds the token to the Authorization header", () => {
-            expect(testClient.defaultHeaders())
+            expect(testClient.instance.defaults.headers)
                 .to.have.property("Authorization")
                 .that.is.equal("token test-token");
         });

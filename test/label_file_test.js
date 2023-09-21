@@ -47,16 +47,22 @@ describe("labelFile", () => {
             }
         });
         it("throws an error for a single bad label", () => {
-            assert.throws(() => validateLabels([badNoName]),
-                LabelValidationError);
+            assert.throws(
+                () => validateLabels([badNoName]),
+                LabelValidationError,
+            );
         });
         it("throws an error for a multiple bad labels", () => {
-            assert.throws(() => validateLabels([badNoName, badNoColor]),
-                LabelValidationError);
+            assert.throws(
+                () => validateLabels([badNoName, badNoColor]),
+                LabelValidationError,
+            );
         });
         it("throws an error for a multiple bad labels with good in front", () => {
-            assert.throws(() => validateLabels([goodSimple, badNoName, badNoColor]),
-                LabelValidationError);
+            assert.throws(
+                () => validateLabels([goodSimple, badNoName, badNoColor]),
+                LabelValidationError,
+            );
         });
         it("error contains only first error", () => {
             try {
