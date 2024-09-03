@@ -1,8 +1,8 @@
-const yaml = require("js-yaml");
-const fs = require("fs");
-const _ = require("lodash/fp");
+import yaml from "js-yaml";
+import fs from "fs";
+import _ from "lodash/fp.js";
 
-class LabelValidationError extends Error {
+export class LabelValidationError extends Error {
     constructor(label) {
         if (label !== undefined && _.has("color")(label)) {
             super(`label item without name. ${label.color}`);
@@ -17,21 +17,21 @@ class LabelValidationError extends Error {
     }
 }
 
-function isInvalidLabel(label) {
+export function isInvalidLabel(label) {
     return label.name === undefined
       || label.name.trim() === ""
       || label.color === undefined
       || String(label.color).trim() === "";
 }
 
-function validateLabels(labels) {
+export function validateLabels(labels) {
     const badLabel = _.find(isInvalidLabel)(labels);
     if (badLabel) {
         throw new LabelValidationError(badLabel);
     }
 }
 
-function read(filename) {
+export function read(filename) {
     if (!fs.existsSync(filename)) {
         throw new Error(`file '${filename}' does not exist`);
     }
@@ -52,7 +52,3 @@ function read(filename) {
     return labels;
 }
 
-module.exports.read = read;
-module.exports.validateLabels = validateLabels;
-module.exports.isInvalidLabel = isInvalidLabel;
-module.exports.LabelValidationError = LabelValidationError;

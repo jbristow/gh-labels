@@ -1,7 +1,7 @@
 /* eslint-env mocha */
-const { assert } = require("chai");
+import { assert } from "chai";
 
-const { isInvalidLabel, validateLabels, LabelValidationError } = require("../src/label_file.js");
+import { isInvalidLabel, validateLabels, LabelValidationError } from "../src/label_file.js";
 
 const goodSimple = { name: "label-name", color: "123456" };
 

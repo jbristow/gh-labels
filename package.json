@@ -4,7 +4,7 @@
   "description": "This repo is used to manage Github issue labels.",
   "main": "src/main.js",
   "dependencies": {
-    "axios": "^1.5.0",
+    "axios": "^1.7.7",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "yargs": "^17.7.2"
@@ -13,6 +13,7 @@
     "test": "node_modules/.bin/nyc node_modules/.bin/mocha",
     "check": "node_modules/.bin/eslint -c ./.eslintrc.yml --ext js src/ test/"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/jbristow/gh-labels"
@@ -22,15 +23,15 @@
     "gh-labels": "bin/gh_labels.js"
   },
   "devDependencies": {
-    "chai": "^4.3.8",
+    "chai": "^5.1.1",
     "eslint": "^8.49.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-chai-expect": "^3.0.0",
+    "eslint-plugin-chai-expect": "^3.1.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-lodash-fp": "^2.2.0-a1",
-    "eslint-plugin-mocha": "^10.1.0",
-    "mocha": "^10.2.0",
-    "nyc": "^15.1.0"
+    "eslint-plugin-mocha": "^10.5.0",
+    "mocha": "^10.7.3",
+    "nyc": "^17.0.0"
   },
   "license": "MIT",
   "publishConfig": {

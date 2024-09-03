@@ -1,6 +1,6 @@
 /* eslint-env mocha */
-const { expect } = require("chai");
-const Client = require("../src/client");
+import { expect } from "chai";
+import Client from "../src/client.js";
 
 const testClient = new Client("test-token", "test-url");
 

@@ -1,5 +1,5 @@
-const axios = require("axios");
-const _ = require("lodash/fp");
+import axios from "axios";
+import _ from "lodash/fp.js";
 
 async function handleError(errorObj) {
     const { config = { url: "unknown" } } = errorObj;
@@ -18,7 +18,7 @@ async function handleError(errorObj) {
     throw new Error(`unknown error: ${errorObj}`);
 }
 
-class Client {
+export default class Client {
     constructor(token, baseUrl) {
         this.instance = axios.create({
             baseURL: baseUrl,
@@ -107,4 +107,3 @@ class Client {
     }
 }
 
-module.exports = Client;
