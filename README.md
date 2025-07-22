@@ -18,7 +18,7 @@ npm link
 
 ## Usage
 The labels that will be created are in `labels.yml`. Any existing labels that
-are setup on the repos will be removed if they do not exist in `labels.yml`.
+are set up on the repos will be removed if they do not exist in `labels.yml`.
 The repos that will be processed exist in organization as defined by `org` in the script.
 
 * Run on a single repo:

@@ -1,4 +1,4 @@
-import yaml from "js-yaml";
+import {load as yamlLoad} from "js-yaml";
 import fs from "fs";
 import _ from "lodash/fp.js";
 
@@ -9,7 +9,9 @@ export class LabelValidationError extends Error {
         } else if (label !== undefined && _.has("name")(label)) {
             super(`label item without color. ${label.name}`);
         } else {
-            super(`label item must have name and color: ${JSON.stringify(label)}`);
+            super(
+                `label item must have name and color: ${JSON.stringify(label)}`,
+            );
         }
         Error.captureStackTrace(this, this.constructor);
         this.name = this.constructor.name;
@@ -18,10 +20,12 @@ export class LabelValidationError extends Error {
 }
 
 export function isInvalidLabel(label) {
-    return label.name === undefined
-      || label.name.trim() === ""
-      || label.color === undefined
-      || String(label.color).trim() === "";
+    return (
+        label.name === undefined ||
+        label.name.trim() === "" ||
+        label.color === undefined ||
+        String(label.color).trim() === ""
+    );
 }
 
 export function validateLabels(labels) {
@@ -38,7 +42,7 @@ export function read(filename) {
 
     let labels;
     try {
-        labels = yaml.load(fs.readFileSync(filename, "utf8"));
+        labels = yamlLoad(fs.readFileSync(filename, "utf8"));
     } catch (e) {
         throw new Error(`invalid yaml file '${filename}': ${e}`);
     }
@@ -51,4 +55,3 @@ export function read(filename) {
 
     return labels;
 }
-
